@@ -20,7 +20,7 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     url='https://github.com/andrei-papou/torch-iter',
     packages=setuptools.find_packages(exclude=('tests')),
-    install_requires=read_requirements('requirements/core.txt'),
+    install_requires=read_requirements('requirements/base/core.txt'),
     classifiers=[
         'Programming Language :: Python :: 3.7',
         'Operating System :: OS Independent',
