@@ -1,0 +1,2 @@
+-r base/core.txt
+-r base/dev.txt
