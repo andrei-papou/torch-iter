@@ -14,6 +14,10 @@ class IterPlanner(t.Generic[_T]):
         self._data_loader = data_loader
 
     @property
+    def epoch(self) -> int:
+        raise NotImplementedError()
+
+    @property
     def step(self) -> int:
         raise NotImplementedError()
 

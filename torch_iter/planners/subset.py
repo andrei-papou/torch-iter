@@ -19,7 +19,12 @@ class _SubsetIterPlanner(IterPlanner[_T]):
         super().__init__(data_loader)
         self._it = SizedIter.from_data_loader(data_loader)
         self._stop_at_epoch_end = stop_at_epoch_end
+        self._epoch = 0
         self._step = 0
+
+    @property
+    def epoch(self) -> int:
+        return self._epoch
 
     @property
     def step(self) -> int:
@@ -27,14 +32,15 @@ class _SubsetIterPlanner(IterPlanner[_T]):
 
     def _rebuild_it(self):
         self._it = SizedIter.from_data_loader(self._data_loader)
-        self._step += 1
+        self._epoch += 1
 
     def _get_next_iter(self, subset_size: int) -> SizedIter[t.Tuple[Index, _T]]:
+        self._step += 1
         if len(self._it) - subset_size < subset_size and self._stop_at_epoch_end:
             old_it = self._it
             self._rebuild_it()
             return local_index_range(
-                self._step - 1,
+                self._epoch - 1,
                 len(self._data_loader) - len(old_it),
                 len(self._data_loader),
                 len(self._data_loader)).zip(old_it)
@@ -42,19 +48,19 @@ class _SubsetIterPlanner(IterPlanner[_T]):
             old_it = self._it
             self._rebuild_it()
             return local_index_range(
-                self._step - 1,
+                self._epoch - 1,
                 len(self._data_loader) - len(old_it),
                 len(self._data_loader),
                 len(self._data_loader)
             ).zip(old_it).chain(
                 local_index_range(
-                    self._step,
+                    self._epoch,
                     0,
                     subset_size - len(old_it),
                     len(self._data_loader)
                 ).zip(SizedIter(self._it, subset_size - len(old_it))))
         return local_index_range(
-            self._step,
+            self._epoch,
             len(self._data_loader) - len(self._it),
             len(self._data_loader) - len(self._it) + subset_size,
             len(self._data_loader)).zip(SizedIter(self._it, subset_size))
@@ -108,7 +114,7 @@ class EpochBasedSubsetIterPlanner(_SubsetIterPlanner[_T]):
         raise RuntimeError('Subset size not found but it is guaranteed to be available for 0.')
 
     def get_next_iter(self, val_metric: t.Optional[float] = None) -> SizedIter[t.Tuple[Index, _T]]:
-        return self._get_next_iter(self._get_subset_size_for_epoch(self._step))
+        return self._get_next_iter(self._get_subset_size_for_epoch(self._epoch))
 
 
 class EpochBasedSubsetIterPlannerBuilder(IterPlannerBuilder[_T]):

@@ -34,15 +34,20 @@ class RangeDataLoader:
 def test_fixed_subset_iter_planner():
     builder = FixedSubsetIterPlannerBuilder(subset_size=NatSubsetSize(2))
     planner = builder.build(data_loader=RangeDataLoader(5))
+    assert planner.epoch == 0
+    assert planner.step == 0
     it = planner.get_next_iter()
     assert len(it) == 2
-    assert planner.step == 0
+    assert planner.epoch == 0
+    assert planner.step == 1
     assert next(it) == (Index(0, (0, 5)), 0)
     assert next(it) == (Index(0, (1, 5)), 1)
     assert is_empty(it)
-    assert planner.step == 0
-    it = planner.get_next_iter()
+    assert planner.epoch == 0
     assert planner.step == 1
+    it = planner.get_next_iter()
+    assert planner.epoch == 1
+    assert planner.step == 2
     assert len(it) == 3
     assert next(it) == (Index(0, (2, 5)), 2)
     assert next(it) == (Index(0, (3, 5)), 3)
