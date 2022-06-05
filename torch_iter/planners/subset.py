@@ -21,6 +21,10 @@ class _SubsetIterPlanner(IterPlanner[_T]):
         self._stop_at_epoch_end = stop_at_epoch_end
         self._step = 0
 
+    @property
+    def step(self) -> int:
+        return self._step
+
     def _rebuild_it(self):
         self._it = SizedIter.from_data_loader(self._data_loader)
         self._step += 1

@@ -13,6 +13,10 @@ class IterPlanner(t.Generic[_T]):
     def __init__(self, data_loader: DataLoader[_T]) -> None:
         self._data_loader = data_loader
 
+    @property
+    def step(self) -> int:
+        raise NotImplementedError()
+
     def get_next_iter(self, val_metric: t.Optional[float] = None) -> SizedIter[t.Tuple[Index, _T]]:
         raise NotImplementedError()
 
